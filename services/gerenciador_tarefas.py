@@ -140,7 +140,7 @@ class GerenciadorTarefas:
         conn = conectar()
         cursor = conn.cursor()
 
-        cursor.execute(f"SELECT * FROM tarefas WHERE usuario_id=? ORDER BY descricao {ordenacao}",
+        cursor.execute(f"SELECT * FROM tarefas WHERE usuario_id=? ORDER BY descricao COLLATE NOCASE {ordenacao}",
                        (self.usuario_logado.id,))
         rows = cursor.fetchall()
 
