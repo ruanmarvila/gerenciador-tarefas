@@ -1,0 +1,18 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-vv -ra -s --tb=short --cov=src --cov-branch --cov-report=term-missing --cov-report=html"
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 113
+target-version = "py313"
+ignore= ["B008"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "UP"
+]
