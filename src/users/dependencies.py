@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import Depends, Header
+from fastapi import Depends
 from sqlalchemy.future import select
 
 from src.core.database import DBSession
-from src.core.security import verify_refresh_token, verify_token
+from src.core.security import verify_access_token, verify_refresh_token
 from src.users.exceptions import AccountDisabledError, UserNotFoundError
 from src.users.models import User
 from src.users.repository import UserRepository
@@ -23,7 +23,7 @@ def get_user_service(repo: UserRepositoryDep) -> UserService:
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 
 
-async def get_current_user(session: DBSession, user_id: int = Depends(verify_token)) -> User:
+async def get_current_user(session: DBSession, user_id: int = Depends(verify_access_token)) -> User:
     result = await session.execute(
         select(User).where(User.id == user_id)
     )
@@ -37,12 +37,7 @@ async def get_current_user(session: DBSession, user_id: int = Depends(verify_tok
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
-async def get_user_via_refresh_token(
-        x_refresh_token: Annotated[str, Header(..., description="Send the refresh token here")], 
-        session: DBSession
-        ) -> User:
-    user_id = verify_refresh_token(x_refresh_token)
-
+async def get_user_via_refresh_token(session: DBSession, user_id: int = Depends(verify_refresh_token)) -> User:
     result = await session.execute(
         select(User).where(User.id == user_id)
     )

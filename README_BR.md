@@ -15,7 +15,6 @@ Uma API RESTful assíncrona para gerenciamento de tarefas desenvolvida com Pytho
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Como executar](#como-executar)
 - [Documentação da API](#documentação-da-api)
-- [Próximos passos](#próximos-passos)
 - [Licença](#licença)
 
 ---
@@ -145,7 +144,10 @@ flowchart LR
 │   └── conftest.py
 │
 ├── .env
+├── .gitignore
 ├── alembic.ini
+├── pyproject.toml
+├── README_BR.md
 ├── README.md
 └── requirements.txt
 ```
@@ -233,17 +235,6 @@ POST /auth/create
     "email": "ana@gmail.com"
 }
 ```
-
----
-
-## Próximos Passos:
-
-- [ ] Testes unitários
-- [ ] Testes de Integração
-- [ ] Docker
-- [ ] PostgreSQL
-- [ ] Fazer lógica de recuperação dos 30 dias
-- [ ] Fazer RefreshTokenBearer
 
 ---
 

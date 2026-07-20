@@ -20,15 +20,6 @@ def encrypt_password(password: str) -> str:
 def verify_password(normal_password: str, hashed_password: str) -> bool:
     return pwd_hash.verify(normal_password, hashed_password)
 
-def generate_token(user_id: int, duration: timedelta = timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
-    expiration_date = datetime.now(UTC) + duration
-    info = {
-        "user_id": user_id,
-        "exp": expiration_date
-    }
-    return jwt.encode(info, settings.SECRET_KEY, settings.ALGORITHM)
-
 def create_token(user_id: int, token_type: str, duration: timedelta = timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
     expiration_date = datetime.now(UTC) + duration
@@ -40,14 +31,18 @@ def create_token(user_id: int, token_type: str, duration: timedelta = timedelta(
     return jwt.encode(info, settings.SECRET_KEY, settings.ALGORITHM)
 
 def create_access_token(user_id: int) -> str:
-    return create_token(user_id, "access_token")
+    return create_token(user_id, "access")
 
 def create_refresh_token(user_id: int) -> str:
-    return create_token(user_id, "refresh_token", timedelta(days=30))
+    return create_token(user_id, "refresh", timedelta(days=30))
 
-def verify_token(token: str = Depends(oauth2_schema)) -> int:
+def verify_access_token(token: str = Depends(oauth2_schema)) -> int:
     try:
         info = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        
+        if info.get("type") != "access":
+            raise InvalidCredentialsError("Invalid token type")
+
         user_id = info.get("user_id")
 
         if user_id is None:
@@ -62,9 +57,13 @@ def verify_token(token: str = Depends(oauth2_schema)) -> int:
     except (TypeError, ValueError) as err:
         raise InvalidCredentialsError() from err
 
-def verify_refresh_token(token: str) -> int:
+def verify_refresh_token(token: str = Depends(oauth2_schema)) -> int:
     try:
         info = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+
+        if info.get("type") != "refresh":
+            raise InvalidCredentialsError("Invalid token type")
+
         user_id = info.get("user_id")
 
         if user_id is None:

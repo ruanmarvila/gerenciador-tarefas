@@ -17,7 +17,6 @@ An asynchronous RESTFul API for task management built with Python and FastAPI. T
 - [Project Structure](#project-structure)
 - [Installation](#installation)
 - [API Documentation](#api-documentation)
-- [Roadmap](#roadmap)
 - [License](#license)
 
 ---
@@ -148,7 +147,9 @@ flowchart LR
 │   └── conftest.py
 │
 ├── .env
+├── .gitignore
 ├── alembic.ini
+├── pyproject.toml
 ├── README_BR.md
 ├── README.md
 └── requirements.txt
@@ -242,14 +243,6 @@ POST /auth/create
 
 ---
 
-## Roadmap:
-
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] Docker
-- [ ] PostgreSQL
-
----
 
 ## License:
 

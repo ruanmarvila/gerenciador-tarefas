@@ -1,3 +1,5 @@
+from datetime import UTC, datetime, timedelta
+
 from src.core.security import encrypt_password, verify_password
 from src.users.exceptions import (
     AccountAlreadyActivateError,
@@ -5,6 +7,7 @@ from src.users.exceptions import (
     AuthenticationError,
     EmailAlreadyExistsError,
     PasswordReuseError,
+    UserNotFoundError,
 )
 from src.users.models import User
 from src.users.repository import UserRepository
@@ -35,7 +38,11 @@ class UserService:
             raise AuthenticationError()
         
         if user.deleted_at:
-            raise AccountDisabledError()
+            recovery_deadline = user.deleted_at + timedelta(days=30)
+            if recovery_deadline > datetime.now(UTC):
+                raise AccountDisabledError()
+            
+            raise UserNotFoundError()
         
         return user
 
@@ -76,8 +83,12 @@ class UserService:
         if not user or not verify_password(user_schema.password, user.password):
             raise AuthenticationError()
         
-        if not user.deleted_at:
+        if user.deleted_at is None:
             raise AccountAlreadyActivateError()
+        
+        recovery_deadline = user.deleted_at + timedelta(days=30)
+        if recovery_deadline < datetime.now(UTC):
+            raise UserNotFoundError()
 
         restored_user = await self.repo.restore(user)
         await self.repo.session.commit()

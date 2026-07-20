@@ -134,7 +134,7 @@ async def test_login_with_disable_account(client, user, token):
 async def test_refresh_token_returns_new_access_token(client, user, refresh_token):
     response = await client.post(
         "/api/v1/auth/refresh",
-        headers = {"x-refresh-token": refresh_token},
+        headers = {"Authorization": f"Bearer {refresh_token}"},
     )
 
     data = response.json()
@@ -152,12 +152,12 @@ async def test_refresh_with_expired_token_returns_unauthorized(client, user):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        token = response.json()["refresh_token"]
+        refresh_token = response.json()["refresh_token"]
     
     with freeze_time("2026-08-08 12:01:00"):
         response = await client.post(
             "/api/v1/auth/refresh",
-            headers = {"x-refresh-token": token},
+            headers = {"Authorization": f"Bearer {refresh_token}"},
         )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED

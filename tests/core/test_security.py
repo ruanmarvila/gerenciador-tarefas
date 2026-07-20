@@ -3,20 +3,23 @@ import pytest
 
 from src.core.config import settings
 from src.core.exceptions import InvalidCredentialsError
-from src.core.security import verify_refresh_token, verify_token
+from src.core.security import verify_access_token, verify_refresh_token
 
 
-def test_verify_token_without_user_id(user):
+def test_verify_access_token_without_user_id(user):
     token = jwt.encode(
-        {"email": user.email},
+        {
+            "email": user.email,
+            "type": "access"
+        },
         settings.SECRET_KEY,
         settings.ALGORITHM,
     )
 
     with pytest.raises(InvalidCredentialsError, match="Token without user_id"):
-        verify_token(token)
+        verify_access_token(token)
 
-def test_verify_token_with_invalid_token(user):
+def test_verify_access_token_with_invalid_token(user):
     token = jwt.encode(
         {"user_id": user.id},
         "fhke4B6M467lZerJxFTwUTyMmSkpAFdBiI40qirJ2fg",
@@ -24,11 +27,14 @@ def test_verify_token_with_invalid_token(user):
     )
 
     with pytest.raises(InvalidCredentialsError, match="Invalid access token"):
-        verify_token(token)
+        verify_access_token(token)
 
 def test_verify_refresh_token_without_user_id(user):
     token = jwt.encode(
-        {"email": user.email},
+        {
+            "email": user.email,
+            "type": "refresh"
+        },
         settings.SECRET_KEY,
         settings.ALGORITHM,
     )

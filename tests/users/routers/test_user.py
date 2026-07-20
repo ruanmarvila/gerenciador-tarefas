@@ -26,6 +26,15 @@ async def test_get_user_without_token_returns_unauthorized(client):
     assert response.json()["detail"] == "Invalid access token"
 
 @pytest.mark.asyncio
+async def test_refresh_token_cannot_access_get_user(client, refresh_token):
+    response = await client.get(
+        "api/v1/users/me",
+        headers = {"Authorization": f"Bearer {refresh_token}"},
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("name, email",[
     ("Ana", "anaclara@gmail.com"),
     (None, "ruan@gmail.com"),
